@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MY NAMES</title>
+  </head>
+  <body>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"control
+
+  <title>Vue.js Jumping Game</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    #game {
+      width: 600px;
+      height: 300px;
+      background: blue;
+      position: relative;
+      overflow: hidden;
+      margin: 50px auto;
+      border: 2px solid: green;
+    }
+
+    .character {
+      width: 50px;
+      height: 50px;
+      background: red;
+      position: absolute;
+      bottom: 0;
+      left: 50px;
+      transition: bottom 0.1s;
+    }
+
+    .obstacle {
+      width: 40px;
+      height: 40px;
+      background: green;
+      position: absolute;
+      bottom: 0;
+      right: 40px;
+    }
+
+    .jumping {
+      animation: jump 0.6s ease;
+    }
+
+    @keyframes jump {
+      0% { bottom: 0; }
+      50% { bottom: 120px; }
+      100% { bottom: 0; }
+    }
+  </style>
+</head>
+<body> 
+
+<div id="app">
+  <div id="game">
+    <div class="character" :class="{ jumping: isJumping }" ref="character"></div>
+    <div class="obstacle" :style="{ right: obstacleRight + 'px' }" ref="obstacle"></div>
+  </div>
+  <h3 style="text-align: center;">{{ gameOver ? 'Game Over! Press R to Restart' : 'Press Space to Jump' }}</h3>
+</div>
+
+<script>
+  const { createApp, ref, onMounted } = Vue;
+
+  createApp({
+    setup() {
+      const character = ref(null);
+      const obstacle = ref(null);
+      const isJumping = ref(false);
+      const gameOver = ref(false);
+      const obstacleRight = ref(-40);
+      let obstacleInterval = null;
+      let gameLoop = null;
+
+      function jump() {
+        if (isJumping.value || gameOver.value) return;
+        isJumping.value = true;
+        setTimeout(() => {
+          isJumping.value = false;
+        }, 600);
+      }
+
+      function restartGame() {
+        gameOver.value = false;
+        obstacleRight.value = -40;
+        startObstacle();
+        startCollisionCheck();
+      }
+
+      function startObstacle() {
+        clearInterval(obstacleInterval);
+        obstacleInterval = setInterval(() => {
+          if (gameOver.value) return;
+          obstacleRight.value += 5;
+          if (obstacleRight.value > 640) {
+            obstacleRight.value = -40;
+          }
+        }, 20);
+      }
+
+      function startCollisionCheck() {
+        clearInterval(gameLoop);
+        gameLoop = setInterval(() => {
+          const obsX = 600 - obstacleRight.value;
+          const isInRange = obsX > 50 && obsX < 100;
+          const isOnGround = !isJumping.value;
+          if (isInRange && isOnGround) {
+            gameOver.value = true;
+            clearInterval(obstacleInterval);
+            clearInterval(gameLoop);
+          }
+        }, 10);
+      }
+
+      onMounted(() => {
+        startObstacle();
+        startCollisionCheck();
+
+        window.addEventListener('keydown', (e) => {
+          if (e.code === 'Space') {
+            jump();
+          } else if (e.code === 'KeyR' && gameOver.value) {
+            restartGame();
+          }
+        });
+      });
+
+      return {
+        character,
+        obstacle,
+        isJumping,
+        gameOver,
+        obstacle,
+      };
+    }
+  }).mount('#app');
+</script>
+
+</body>
+</html>
+  </body>
+</html>
